@@ -6,7 +6,6 @@ local Brain = Class:extend()
 local Hive = Class:extend()
 local State = Class:extend()
 local Food = Class:extend()
-local Job = Class:extend()
 local Base = Class:extend()
 
 local priorities = {
@@ -129,14 +128,6 @@ function Base:new(x, y)
 end
 
 -- #############################################################################
--- 
--- #############################################################################
-function Job:new(type, entity)
-  self.type = type
-  self.entity = entity
-end
-
--- #############################################################################
 -- Represents a working unit 
 -- #############################################################################
 function Worker:new()
@@ -144,26 +135,10 @@ function Worker:new()
   self.position = Vec(150, 150)
   self.speed = 100
   self.attackRadius = 150
-  self.jobs = {}
   self.hands = {}
 end
 function Worker:update(dt)
   self.brain:update(dt)
-end
-function Worker:canAddJob(job)
-  for i, j in ipairs(self.jobs) do
-    if job.type == j.type and job.entity == j.entity then return false end
-  end
-  return true
-end
-function Worker:pushJob(job)
-  if self:canAddJob(job) then
-    print("[+]Add job " .. job.type)
-    table.insert(self.jobs, job)
-  end
-end
-function Worker:removeJob()
-  table.remove(self.jobs, 1)
 end
 
 -- #############################################################################
@@ -284,9 +259,6 @@ end
 function love.keypressed(key, code, isRepeat)
   if key == "escape" then
     love.event.quit()
-  end
-  if key == "left" then
-    workers[1].brain:transition('attack')
   end
   if key == "r" then
     love.event.quit("restart")
