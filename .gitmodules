@@ -1,0 +1,6 @@
+[submodule "thirdparty/classic"]
+	path = thirdparty/classic
+	url = git@github.com:rxi/classic.git
+[submodule "thirdparty/hump"]
+	path = thirdparty/hump
+	url = git@github.com:vrld/hump.git
