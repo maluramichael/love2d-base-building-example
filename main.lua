@@ -8,15 +8,25 @@ Base = require "base"
 Food = require "food"
 
 function love.load()
+  love.math.setRandomSeed(love.timer.getTime())
+  love.graphics.setDefaultFilter("nearest", "nearest")
+
+  imageApple = love.graphics.newImage("assets/images/apple.png")
+  workerImage = love.graphics.newImage("assets/images/worker.png")
+  workerQuad = love.graphics.newQuad(0, 0, 16, 16, workerImage:getDimensions())
+
   workers = {
     Worker()
   }
-  food = {
-    Food(math.random(100, 700), math.random(100, 500)),
-    Food(math.random(100, 700), math.random(100, 500))
-  }
+  food = {}
   base = Base(400, 300)
   hive = Hive()
+
+  for i = 1, 5 do
+    spawnFood()
+  end
+
+  foodSpawnTimer = 1
 end
 
 -- system
@@ -31,15 +41,15 @@ function love.draw()
   love.graphics.print(string.format("%d, %d", mx, my))
   for i, w in ipairs(workers) do
     local x, y = math.floor(w.position.x), math.floor(w.position.y)
-    love.graphics.setColor(1, 0, 0, 0.3)
+    love.graphics.setColor(1, 0, 0, 0.1)
     love.graphics.circle("fill", x, y, w.attackRadius)
     love.graphics.setColor(1, 1, 1)
-    love.graphics.circle("fill", x, y, 10)
+    love.graphics.draw(workerImage, workerQuad, x - 16, y - 16, 0, 2)
     love.graphics.print(
       string.format(
-        "pos(%d, %d)\ndistance(%d)\nstate(%s)", 
-        x, y, mouse:dist(w.position), w.brain.current
-      ), x - 10, y + 20
+        "pos(%d, %d)\ndistance(%d)\nstate(%s)\nweight(%f/%d)",
+        x, y, mouse:dist(w.position), w.brain.current, w.weight, w.maxWeight
+      ), x, y + 20
     )
   end
   love.graphics.pop()
@@ -48,8 +58,7 @@ function love.draw()
   love.graphics.push("all")
   for i, f in ipairs(food) do
     local x, y = math.floor(f.position.x), math.floor(f.position.y)
-    love.graphics.setColor(0, 1, 1)
-    love.graphics.circle("fill", x, y, 4)
+    love.graphics.draw(imageApple, x - 16, y - 16, 0, 2)
     love.graphics.print(string.format("amount(%d)", f.amount), x, y)
   end
   love.graphics.pop()
@@ -64,6 +73,12 @@ end
 
 function love.update(dt)
   hive:update(dt)
+
+  foodSpawnTimer = foodSpawnTimer - dt
+  if foodSpawnTimer <= 0 then
+    foodSpawnTimer = 1
+    spawnFood()
+  end
 end
 
 function love.keypressed(key, code, isRepeat)
@@ -72,5 +87,11 @@ function love.keypressed(key, code, isRepeat)
   end
   if key == "r" then
     love.event.quit("restart")
+  end
+end
+
+function spawnFood()
+  if #food <= 20 then
+    table.insert(food, Food(math.random(100, 700), math.random(100, 500)))
   end
 end
