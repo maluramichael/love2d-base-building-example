@@ -1,6 +1,8 @@
 Class = require "thirdparty.classic.classic"
 Vec = require "thirdparty.hump.vector"
 
+Settings = require "settings"
+
 Worker = require "worker"
 Brain = require "brain"
 Hive = require "hive"
@@ -15,18 +17,16 @@ function love.load()
   workerImage = love.graphics.newImage("assets/images/worker.png")
   workerQuad = love.graphics.newQuad(0, 0, 16, 16, workerImage:getDimensions())
 
-  workers = {
-    Worker()
-  }
+  workers = {}
   food = {}
-  base = Base(400, 300)
+  base = Base(Settings.width * 0.5, Settings.height * 0.5)
   hive = Hive()
 
-  for i = 1, 5 do
-    spawnFood()
+  for i = 1, 10 do
+    table.insert(workers, Worker(math.random(100, Settings.width - 100), math.random(100, Settings.height - 100)))
   end
 
-  foodSpawnTimer = 1
+  foodSpawnTimer = 0.3
 end
 
 -- system
@@ -48,8 +48,15 @@ function love.draw()
     love.graphics.print(
       string.format(
         "pos(%d, %d)\ndistance(%d)\nstate(%s)\nweight(%f/%d)",
-        x, y, mouse:dist(w.position), w.brain.current, w.weight, w.maxWeight
-      ), x, y + 20
+        x,
+        y,
+        mouse:dist(w.position),
+        w.brain.current,
+        w.weight,
+        w.maxWeight
+      ),
+      x,
+      y + 20
     )
   end
   love.graphics.pop()
@@ -66,7 +73,7 @@ function love.draw()
   -- Draw base
   love.graphics.push("all")
   love.graphics.setColor(1, 1, 0)
-  love.graphics.circle('line', base.position.x, base.position.y, 40)
+  love.graphics.circle("line", base.position.x, base.position.y, 40)
   love.graphics.print(string.format("food(%d)", base.food), base.position.x - 40, base.position.y + 50)
   love.graphics.pop()
 end
@@ -76,7 +83,7 @@ function love.update(dt)
 
   foodSpawnTimer = foodSpawnTimer - dt
   if foodSpawnTimer <= 0 then
-    foodSpawnTimer = 1
+    foodSpawnTimer = 0.3
     spawnFood()
   end
 end
@@ -92,6 +99,6 @@ end
 
 function spawnFood()
   if #food <= 20 then
-    table.insert(food, Food(math.random(100, 700), math.random(100, 500)))
+    table.insert(food, Food(math.random(100, Settings.width - 100), math.random(100, Settings.height - 100)))
   end
 end

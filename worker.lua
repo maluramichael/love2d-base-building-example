@@ -4,9 +4,9 @@ Vec = require "thirdparty.hump.vector"
 States = require "states"
 
 local Worker = Class:extend()
-function Worker:new()
+function Worker:new(x, y)
   self.brain = Brain(self, "idling", States)
-  self.position = Vec(150, 150)
+  self.position = Vec(x, y)
 
   self.bag = {}
 

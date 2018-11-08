@@ -36,12 +36,13 @@ return {
       local next = nil
       for i, f in ipairs(food) do
         local distance = host.position:dist(f.position)
-        if distance < shortestDistance then
+        if distance < shortestDistance and (f.isGettingPickedUpBy == nil or f.isGettingPickedUpBy == host) then
           next = f
           shortestDistance = distance
         end
       end
       if next ~= nil then
+        next.isGettingPickedUpBy = host
         if next.position:dist(host.position) < 10 then
           -- if host.weight + next.weight * next.amount > host.maxWeight then
           --   print("To much to carry. Have to split stack.")

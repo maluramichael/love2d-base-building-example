@@ -5,5 +5,6 @@ function Food:new(x, y)
   self.position = Vec(x, y)
   self.amount = math.random(5, 30)
   self.weight = 0.1
+  self.isGettingPickedUpBy = nil
 end
 return Food
